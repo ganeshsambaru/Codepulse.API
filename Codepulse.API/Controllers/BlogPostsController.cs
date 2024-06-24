@@ -11,46 +11,44 @@ namespace CodePulse.API.Controllers
     public class BlogPostsController : ControllerBase
     {
         private readonly IBlogPostRepository blogPostRepository;
-        
 
         public BlogPostsController(IBlogPostRepository blogPostRepository)
         {
             this.blogPostRepository = blogPostRepository;
         }
-        // POST: {apibaseurl}/api/blogposts
+        // POST:{apibaseurl}/api/blogposts
         [HttpPost]
-
-        public async Task<IActionResult> CreateBlogPost([FromBody] CreateBlogPostRequestDto request)
+        public async Task<IActionResult> CreateBlogPost([FromBody]CreateBlogPostRequestDto request)
         {
-            // convert DTO to Domain
-            var blogpost = new BlogPost
+            // convert DTO to Domain Model
+            var blogPost = new BlogPost
             {
                 Author = request.Author,
                 Content = request.Content,
                 FeaturedImageUrl = request.FeaturedImageUrl,
                 IsVisible = request.IsVisible,
                 PublishedDate = request.PublishedDate,
-                ShortDescription = request.ShortDescription,
+                ShortDescription = request.shortDescription,
                 Title = request.Title,
                 UrlHandle = request.UrlHandle,
-
-                
             };
-             blogpost= await blogPostRepository.CreateAsync(blogpost);
-            // Convert Domain model back to Dto
+           blogPost= await blogPostRepository.CreateAsync(blogPost);
+            // Convert Domain Model back to DTO
             var response = new BlogPostDto
             {
-                Id = blogpost.Id,
-                Author = blogpost.Author,
-                Content = blogpost.Content,
-                FeaturedImageUrl = blogpost.FeaturedImageUrl,
-                IsVisible = blogpost.IsVisible,
-                PublishedDate = blogpost.PublishedDate,
-                ShortDescription = blogpost.ShortDescription,
-                Title = blogpost.Title,
-                UrlHandle = blogpost.UrlHandle,
+                Id = blogPost.Id,
+                Author = blogPost.Author,
+                Content = blogPost.Content,
+                FeaturedImageUrl = blogPost.FeaturedImageUrl,
+                IsVisible = blogPost.IsVisible,
+                PublishedDate = blogPost.PublishedDate,
+                ShortDescription = blogPost.ShortDescription,
+                Title = blogPost.Title,
+                UrlHandle = blogPost.UrlHandle,
+
             };
             return Ok(response);
-        }
+        }    
+
     }
 }

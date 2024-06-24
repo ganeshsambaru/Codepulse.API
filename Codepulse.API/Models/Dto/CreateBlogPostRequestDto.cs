@@ -2,9 +2,7 @@
 {
     public class CreateBlogPostRequestDto
     {
-        internal string Description;
-        internal string ShortDescription;
-
+       
         public string Title { get; set; }
         public string shortDescription { get; set; }
         public string Content { get; set; }
