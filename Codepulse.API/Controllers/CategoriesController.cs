@@ -3,6 +3,7 @@ using CodePulse.API.Models.Domain;
 using CodePulse.API.Models.Dto;
 using CodePulse.API.Repositories.Implementation;
 using CodePulse.API.Repositories.Interface;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -25,6 +26,7 @@ namespace CodePulse.API.Controllers
         }
 
         [HttpPost]
+       // [Authorize(Roles = "Writer")]
         public async Task<IActionResult> CreateCategory([FromBody] CreateCategoryRequestDto request)
         {
             //map dto to domain model
@@ -49,12 +51,18 @@ namespace CodePulse.API.Controllers
             return Ok();
         }
 
-        //Get:https://localhost:7050/api/Categories
+        //Get:https://localhost:7050/api/Categories?query=html
 
         [HttpGet]
-        public async Task<IActionResult> GetAllCategories()
+        
+        public async Task<IActionResult> GetAllCategories([FromQuery] string? query,
+            [FromQuery] string? sortBy,
+            [FromQuery] string? sortDirection,
+            [FromQuery]int? pageNumber,
+            [FromQuery]int? pageSize)
         {
-            var categories = await categoryRepository.GetAllAsync();
+            var categories = await categoryRepository.
+                GetAllAsync(query,sortBy,sortDirection,pageNumber,pageSize );
 
             //Map domain model to dto
             var response = new List<CategoryDto>();
@@ -91,6 +99,7 @@ namespace CodePulse.API.Controllers
         //Put:https://localhost:7050/api/Categories/{id}
         [HttpPut]
         [Route("{id:Guid}")]
+        [Authorize(Roles = "Writer")]
         public async Task<IActionResult> EditCategory([FromRoute] Guid id, UpdateCategoryRequestDto request)
         {
             //convert DTO to Domainmodel
@@ -122,8 +131,9 @@ namespace CodePulse.API.Controllers
         //DELETE:https://localhost:7050/api/Categories/{id}
         [HttpDelete]
         [Route("{id:Guid}")]
+        [Authorize(Roles = "Writer")]
         public async Task<IActionResult> DeleteCategory([FromRoute] Guid id)
-        {
+        { 
             var category =await categoryRepository.DeleteAsync(id);
             if (category is null)
             {
@@ -137,6 +147,19 @@ namespace CodePulse.API.Controllers
                 UrlHandle = category.UrlHandle
             };
             return Ok(response);
+        }
+
+
+        // GET:https://localhost:7050/api/Categories/count
+        [HttpGet]
+        [Route("count")]
+        //[Authorize(Roles = "Writer")]
+
+        public async Task<IActionResult> GetCategoriesTotal()
+        {
+            var count = await categoryRepository.GetCount();
+
+            return Ok(count);
         }
     }
 }
